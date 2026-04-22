@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>v5beta</title>
+  <script src="/atlas.register.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000000;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    #particles-js {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    aside {
+      position: relative;
+      z-index: 10;
+      width: 72px;
+      background: rgba(5, 5, 5, 0.85);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 0;
+      gap: 4px;
+      flex-shrink: 0;
+      transition: width 0.2s ease, opacity 0.2s ease;
+    }
+
+    body.atlas-mode aside {
+      width: 0;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .nav-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      border: none;
+      background: none;
+      color: rgba(255,255,255,0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      text-decoration: none;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      background: rgba(255,255,255,0.09);
+      color: #fff;
+    }
+
+    .nav-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #atlas-fab {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    body.atlas-mode #atlas-fab { display: flex; }
+
+    #atlas-fab-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(10,10,10,0.85);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #atlas-fab-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #atlas-fab-menu {
+      margin-top: 6px;
+      background: rgba(10,10,10,0.92);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      min-width: 150px;
+    }
+
+    #atlas-fab-menu.open { display: flex; }
+
+    .atlas-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      cursor: pointer;
+      border: none;
+      background: none;
+      text-decoration: none;
+      transition: background 0.1s;
+      text-align: left;
+      width: 100%;
+    }
+
+    .atlas-nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+
+    .atlas-nav-item svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+      opacity: 0.6;
+    }
+
+    .nav-spacer { flex: 1; }
+
+    .nav-divider {
+      width: 32px;
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+      display: none;
+      flex-shrink: 0;
+    }
+
+    body.game-mode .nav-divider { display: block; }
+
+    .game-nav-btn {
+      display: none;
+    }
+
+    body.game-mode .game-nav-btn { display: flex; }
+
+    #frame {
+      flex: 1;
+      position: relative;
+      z-index: 10;
+      border: none;
+      background: transparent;
+      transition: opacity 0.15s ease;
+    }
+
+    .discord-fab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 20;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: #5865F2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(88, 101, 242, 0.5);
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .discord-fab:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 28px rgba(88, 101, 242, 0.7);
+    }
+
+    .discord-fab svg {
+      width: 22px;
+      height: 22px;
+      fill: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+
+  <aside>
+    <a class="nav-btn active" data-src="/home.html" title="Home">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+    </a>
+    <a class="nav-btn" data-src="/games.html" title="Games">
+      <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M8 12h4m-2-2v4M16 12h.01M18 12h.01"/></svg>
+    </a>
+    <a class="nav-btn" data-src="/atlas/aHR0cHM6Ly92YXBvci5vbmwvcGFnZS9tdXNpYy9pbmRleC5odG1s" title="Music">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M9 18V5l12-2v13" stroke="currentColor"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    </a>
+    <div class="nav-divider"></div>
+    <button class="nav-btn game-nav-btn" id="btn-game-back" title="Back to games">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
+    <button class="nav-btn game-nav-btn" id="btn-game-fullscreen" title="Fullscreen">
+      <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
+    </button>
+    <div class="nav-spacer"></div>
+    <a href="https://github.com/brominenetwork/Atlas" target="_blank" rel="noopener" class="nav-btn" title="GitHub">
+      <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+    </a>
+    <a href="https://discord.gg/unblockings" target="_blank" rel="noopener" class="nav-btn" title="Discord">
+      <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+    </a>
+  </aside>
+
+  <div id="atlas-fab">
+    <button id="atlas-fab-btn">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div id="atlas-fab-menu">
+      <a class="atlas-nav-item" data-src="/home.html">
+        <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+        Home
+      </a>
+      <a class="atlas-nav-item" data-src="/games.html">
+        <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M8 12h4m-2-2v4M16 12h.01M18 12h.01"/></svg>
+        Games
+      </a>
+      <a class="atlas-nav-item" data-src="/atlas/aHR0cHM6Ly92YXBvci5vbmwvcGFnZS9tdXNpYy9pbmRleC5odG1s">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 18V5l12-2v13" stroke="currentColor"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Music
+      </a>
+    </div>
+  </div>
+
+  <iframe id="frame" src="/home.html" allowtransparency="true"></iframe>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {"particles":{"number":{"value":43,"density":{"enable":true,"value_area":800}},"color":{"value":"#ffffff"},"shape":{"type":"circle","stroke":{"width":0,"color":"#000000"},"polygon":{"nb_sides":5}},"opacity":{"value":1,"random":false,"anim":{"enable":true,"speed":3.654347455356053,"opacity_min":0.503487871626834,"sync":false}},"size":{"value":3,"random":true,"anim":{"enable":false,"speed":40,"size_min":0.1,"sync":false}},"line_linked":{"enable":false,"distance":64.13648243462092,"color":"#ffffff","opacity":0.25654592973848367,"width":1},"move":{"enable":true,"speed":1,"direction":"none","random":false,"straight":false,"out_mode":"out","bounce":false,"attract":{"enable":false,"rotateX":600,"rotateY":1200}}},"interactivity":{"detect_on":"canvas","events":{"onhover":{"enable":false,"mode":"repulse"},"onclick":{"enable":false,"mode":"push"},"resize":true},"modes":{"grab":{"distance":400,"line_linked":{"opacity":1}},"bubble":{"distance":400,"size":40,"duration":2,"opacity":8,"speed":3},"repulse":{"distance":200,"duration":0.4},"push":{"particles_nb":4},"remove":{"particles_nb":2}}},"retina_detect":true});
+
+    (function () {
+      var frame = document.getElementById("frame");
+      var btns = document.querySelectorAll(".nav-btn[data-src]");
+      var fabBtn = document.getElementById("atlas-fab-btn");
+      var fabMenu = document.getElementById("atlas-fab-menu");
+      var atlasNavItems = document.querySelectorAll(".atlas-nav-item[data-src]");
+
+      function navigate(src) {
+        var isAtlas = src.startsWith("/atlas/");
+        document.body.classList.toggle("atlas-mode", isAtlas);
+        btns.forEach(function (b) {
+          b.classList.toggle("active", b.dataset.src === src);
+        });
+        fabMenu.classList.remove("open");
+
+        frame.style.opacity = "0";
+        frame.onload = null;
+        frame.src = src;
+        frame.onload = function () {
+          frame.onload = null;
+          frame.style.opacity = "1";
+        };
+      }
+
+      btns.forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
+          navigate(btn.dataset.src);
+        });
+      });
+
+      atlasNavItems.forEach(function (item) {
+        item.addEventListener("click", function (e) {
+          e.preventDefault();
+          navigate(item.dataset.src);
+        });
+      });
+
+      fabBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        fabMenu.classList.toggle("open");
+      });
+
+      document.addEventListener("click", function () {
+        fabMenu.classList.remove("open");
+      });
+
+      document.getElementById("btn-game-back").addEventListener("click", function () {
+        frame.contentWindow.postMessage({ type: "game-back" }, "*");
+      });
+
+      document.getElementById("btn-game-fullscreen").addEventListener("click", function () {
+        frame.contentWindow.postMessage({ type: "game-fullscreen" }, "*");
+      });
+
+      window.addEventListener("message", function (e) {
+        if (!e.data) return;
+        if (e.data.type === "nav") navigate(e.data.src);
+        if (e.data.type === "game-open") document.body.classList.add("game-mode");
+        if (e.data.type === "game-close") document.body.classList.remove("game-mode");
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>soloBiB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: transparent;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      padding: 40px;
+    }
+
+    .wordmark {
+      font-family: "Caveat", cursive;
+      font-size: clamp(64px, 10vw, 108px);
+      font-weight: 700;
+      color: #fff;
+      user-select: none;
+      line-height: 1;
+      text-shadow: 0 0 80px rgba(255,255,255,0.1);
+    }
+
+    .tagline {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      margin-top: -16px;
+      letter-spacing: 0.01em;
+    }
+
+    .search-pill {
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .search-pill input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 16px;
+      padding: 18px 28px;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+      caret-color: #fff;
+    }
+
+    .search-pill input::placeholder { color: rgba(255,255,255,0.25); }
+    .search-pill input:focus {
+      border-color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.07);
+    }
+
+    .cloak-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 999px;
+      color: rgba(255,255,255,0.6);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 10px 28px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      letter-spacing: 0.02em;
+    }
+
+    .cloak-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border-color: rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="wordmark">soloBiB</div>
+  <p class="tagline">hallo</p>
+  <div class="search-pill">
+    <form id="searchForm">
+      <input id="query" type="text" placeholder="search or enter a url" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </form>
+  </div>
+  <button class="cloak-btn" id="cloakBtn">about:blank &nbsp;(DOUBLE CLICK)</button>
+
+  <script>
+    (function () {
+      var lastClick = 0;
+
+      document.getElementById("cloakBtn").addEventListener("click", function () {
+        var now = Date.now();
+        if (now - lastClick < 400) {
+          var w = window.open("about:blank", "_blank");
+          var doc = w.document;
+          doc.open();
+          doc.write('<!DOCTYPE html><html><head><title>soloBiB</title></head><body style="margin:0;background:#000;display:flex;height:100vh"><iframe src="' + top.location.origin + '" style="border:none;width:100%;height:100%"></iframe></body></html>');
+          doc.close();
+        }
+        lastClick = now;
+      });
+
+      function encode(u) {
+        try { return btoa(encodeURIComponent(u)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, ""); }
+        catch (e) { return null; }
+      }
+
+      function normalize(s) {
+        s = s.trim();
+        if (!s) return null;
+        if (/^https?:\/\//i.test(s)) { try { new URL(s); return s; } catch (e) {} return null; }
+        if (/\.|^localhost(:\d+)?$/.test(s)) { try { new URL("https://" + s); return "https://" + s; } catch (e) {} }
+        return "https://duckduckgo.com/?q=" + encodeURIComponent(s);
+      }
+
+      document.getElementById("searchForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var url = normalize(document.getElementById("query").value);
+        if (!url) return;
+        var enc = encode(url);
+        if (!enc) return;
+        window.parent.postMessage({ type: "nav", src: "/atlas/" + enc }, "*");
+      });
+    })();
+  </script>
+</body>
+</html>

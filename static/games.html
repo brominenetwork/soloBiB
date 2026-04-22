@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>soloBiB — Games</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --fourth-bg: rgba(255,255,255,0.06);
+      --cb: 255,255,255;
+      --bc: 0,0,0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent;
+      color: white;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    #browser-view {
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      will-change: opacity, transform;
+    }
+
+    #browser-view.view-hidden {
+      opacity: 0;
+      transform: scale(0.98);
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 10px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 48px;
+      padding: 0 12px;
+      background: var(--fourth-bg);
+      border-radius: 14px;
+      border: 1.5px solid rgba(var(--cb), 0.08);
+      pointer-events: auto;
+      width: 420px;
+    }
+
+    .search-bar svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      stroke: rgba(var(--cb), 0.5);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-size: 16px;
+      font-family: inherit;
+    }
+
+    .search-bar input::placeholder { color: rgba(var(--cb), 0.45); }
+    .search-bar input:focus::placeholder { opacity: 0; }
+
+    .grid-container {
+      margin-top: 64px;
+      grid-template-columns: repeat(3, 220px);
+      justify-content: center;
+      gap: 12px;
+      padding: 12px;
+      padding-bottom: 100px;
+      max-height: calc(100vh - 64px);
+      overflow-y: auto;
+      scrollbar-width: none;
+      position: relative;
+      display: grid;
+    }
+
+    .grid-container::-webkit-scrollbar { display: none; }
+
+    .hidden { display: none !important; }
+
+    .card {
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      height: 175px;
+      width: 220px;
+      color: white;
+      font-weight: 500;
+      font-size: 14px;
+      transition: transform 0.2s, opacity 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      background: var(--fourth-bg);
+      will-change: transform;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: var(--bg-image);
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      z-index: 0;
+    }
+
+    .card.loaded::after { opacity: 1; }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: rgba(var(--bc), 0);
+      backdrop-filter: blur(0px);
+      transition: all 0.15s ease;
+      z-index: 1;
+      will-change: background-color, backdrop-filter;
+    }
+
+    .card:hover { transform: scale(1.03); }
+
+    .card:hover::before {
+      background-color: rgba(var(--bc), 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    .card-name {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      text-align: center;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      font-size: 24px;
+      font-weight: 600;
+      color: rgba(var(--cb), 1);
+    }
+
+    .card:hover .card-name { opacity: 1; }
+
+    #game-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 1000;
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      will-change: opacity, transform;
+    }
+
+    #game-overlay.view-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #game-content-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #loading-container {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(var(--cb), 0.12);
+      border-top-color: rgba(var(--cb), 0.7);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="browser-view">
+    <div class="topbar">
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input id="search" type="text" placeholder="Search games..." autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+    <div class="grid-container" id="grid"></div>
+  </div>
+
+  <div id="game-overlay">
+    <iframe id="game-content-frame" allowfullscreen></iframe>
+    <div id="loading-container">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <script>
+    var grid = document.getElementById("grid");
+    var overlay = document.getElementById("game-overlay");
+    var browserView = document.getElementById("browser-view");
+    var frame = document.getElementById("game-content-frame");
+    var loading = document.getElementById("loading-container");
+
+    function openGame(url) {
+      overlay.style.display = "block";
+      loading.style.display = "block";
+      frame.style.opacity = "0";
+      browserView.classList.add("view-hidden");
+      window.parent.postMessage({ type: "game-open" }, "*");
+
+      requestAnimationFrame(function() {
+        overlay.classList.add("view-active");
+      });
+
+      frame.src = url;
+      frame.onload = function() {
+        frame.onload = null;
+        loading.style.display = "none";
+        frame.style.opacity = "1";
+      };
+    }
+
+    function closeGame() {
+      overlay.classList.remove("view-active");
+      browserView.classList.remove("view-hidden");
+      window.parent.postMessage({ type: "game-close" }, "*");
+      setTimeout(function() {
+        overlay.style.display = "none";
+        frame.src = "";
+        frame.style.opacity = "0";
+        loading.style.display = "none";
+      }, 300);
+    }
+
+    window.addEventListener("message", function(e) {
+      if (!e.data) return;
+      if (e.data.type === "game-back") closeGame();
+      if (e.data.type === "game-fullscreen") {
+        if (frame.requestFullscreen) frame.requestFullscreen();
+        else if (frame.webkitRequestFullscreen) frame.webkitRequestFullscreen();
+      }
+    });
+
+    function buildCard(g, i) {
+      var card = document.createElement("div");
+      card.className = "card";
+      card.dataset.name = g.name.toLowerCase();
+
+      if (g.cover) {
+        card.style.setProperty("--bg-image", "url(" + g.cover + ")");
+        var preload = new Image();
+        preload.onload = function() { card.classList.add("loaded"); };
+        preload.src = g.cover;
+      }
+
+      var name = document.createElement("div");
+      name.className = "card-name";
+      name.textContent = g.name;
+
+      card.appendChild(name);
+      card.addEventListener("click", function() { openGame(g.url); });
+      grid.appendChild(card);
+    }
+
+    fetch("/games.json")
+      .then(function(r) { return r.json(); })
+      .then(function(games) { games.forEach(buildCard); });
+
+    document.getElementById("search").addEventListener("input", function() {
+      var q = this.value.toLowerCase().trim();
+      document.querySelectorAll(".card").forEach(function(c) {
+        c.classList.toggle("hidden", q ? !c.dataset.name.includes(q) : false);
+      });
+    });
+  </script>
+</body>
+</html>
