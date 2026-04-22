@@ -264,24 +264,21 @@
   <script src="/vantafog.min.js"></script>
   <script>
 
-// credits: technonyte @ vapor
-// ty for letting me use the bg
-
-    VANTA.FOG({
-      el: "#vanta-bg",
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-        highlightColor: 0xFFCC00,
-        midtoneColor: 0xFF1F00,
-        lowlightColor: 0x2D00FF,
-        baseColor: 0xFFEBEB,
-        blurFactor: 0.6,
-        speed: 1,
-        zoom: 1,
-        scale: 2,
-        scaleMobile: 4,
-    });
+VANTA.FOG({
+  el: "#vanta-bg",
+  mouseControls: true,
+  touchControls: true,
+  gyroControls: false,
+  minHeight: 200.00,
+  minWidth: 200.00,
+  highlightColor: 0xb1341,
+  midtoneColor: 0x1d2661,
+  lowlightColor: 0x160d31,
+  baseColor: 0x4031b,
+  blurFactor: 0.90,
+  speed: 5.00,
+  zoom: 0.40
+})
 
     (function () {
       var frame = document.getElementById("frame");
