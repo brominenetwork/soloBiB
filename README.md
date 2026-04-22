@@ -1,6 +1,6 @@
 <div align="center">
 
-# Atlas (beta 1.0.2)
+# Solo Central v5.0.0
 by Bromine Network
 
 [![Discord](https://img.shields.io/badge/discord-unblockings-5865F2?style=flat-square)](https://discord.gg/unblockings)
@@ -17,8 +17,8 @@ a web proxy. runs in node, uses a service worker to intercept requests, rewrites
 needs node 18+.
 
 ```bash
-git clone https://github.com/brominenetwork/Atlas
-cd Atlas
+git clone https://github.com/brominenetwork/soloBiB
+cd soloBiB
 node server.js
 ```
 
