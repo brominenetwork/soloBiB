@@ -121,19 +121,32 @@
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 72px;
-      height: 6px;
-      background: rgba(255,255,255,0.25);
-      border-radius: 0 0 6px 6px;
+      width: 52px;
+      height: 40px;
+      background: rgba(20,20,20,0.92);
+      border-radius: 0 0 14px 14px;
       cursor: pointer;
       pointer-events: auto;
-      transition: background 0.15s, height 0.15s;
-      z-index: 10;
+      transition: background 0.15s;
+      z-index: 12;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-top: none;
+      gap: 0;
+      flex-direction: column;
     }
 
-    #trigger:hover {
-      background: rgba(255,255,255,0.5);
-      height: 8px;
+    #trigger:hover { background: rgba(35,35,35,0.96); }
+
+    #trigger .bar {
+      width: 18px;
+      height: 2px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 2px;
+      margin: 2px 0;
     }
 
     #overlay-bg {
