@@ -467,6 +467,8 @@
       setTimeout(function () {
         loader.style.display = "none";
         gameUi.classList.add("active");
+        sessionStart = Date.now();
+        setInterval(tickPlaytime, 1000);
       }, 500);
     }
 
