@@ -426,6 +426,10 @@
     var volSlider = document.getElementById("vol-slider");
     var volLabel = document.getElementById("vol-label");
     var shotBtn = document.getElementById("shot-btn");
+    var urlCard = document.getElementById("url-card");
+
+    var displayUrl = useProxy ? raw : targetUrl;
+    urlCard.textContent = displayUrl || targetUrl;
 
     var displayName = raw.replace(/^https?:\/\/(www\.)?/, "").split("/")[0] || raw;
     if (displayName) document.title = displayName + " — soloBiB";
