@@ -516,7 +516,7 @@
 
       function showReady() {
         var anims = logo.getAnimations();
-        if (!anims.length) { finalize(); return; }
+        if (!anims.length) { reveal(); return; }
         var anim = anims[0];
         var duration = anim.effect.getTiming().duration;
         var remaining = duration - (anim.currentTime % duration);
@@ -537,9 +537,25 @@
         showReady();
       }
 
-      frame.src = targetUrl;
-      frame.onload = function () { frame.onload = null; reveal(); };
-      setTimeout(reveal, 500);
+      var frameStarted = false;
+      function loadFrame() {
+        if (frameStarted) return;
+        frameStarted = true;
+        frame.src = targetUrl;
+        frame.onload = function () { frame.onload = null; reveal(); };
+        setTimeout(reveal, 500);
+      }
+
+      if (useProxy && navigator.serviceWorker) {
+        var swFallback = setTimeout(loadFrame, 3000);
+        navigator.serviceWorker.register("/atlas.sw.js", { scope: "/" }).catch(function () {});
+        navigator.serviceWorker.ready.then(function () {
+          clearTimeout(swFallback);
+          loadFrame();
+        }).catch(loadFrame);
+      } else {
+        loadFrame();
+      }
     }
   </script>
 </body>
