@@ -249,52 +249,8 @@
     var loading = document.getElementById("loading-container");
 
     function openGame(url) {
-      frame.style.opacity = "0";
-      frame.src = url;
-      overlay.style.display = "flex";
-      loading.style.display = "block";
-      browserView.classList.add("view-hidden");
-      window.parent.postMessage({ type: "game-open" }, "*");
-
-      requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-          overlay.classList.add("view-active");
-        });
-      });
-
-      var showTimer = setTimeout(function() {
-        loading.style.display = "none";
-        frame.style.opacity = "1";
-      }, 4000);
-
-      frame.onload = function() {
-        frame.onload = null;
-        clearTimeout(showTimer);
-        loading.style.display = "none";
-        frame.style.opacity = "1";
-      };
+      window.parent.postMessage({ type: "open-game", url: url }, "*");
     }
-
-    function closeGame() {
-      overlay.classList.remove("view-active");
-      browserView.classList.remove("view-hidden");
-      window.parent.postMessage({ type: "game-close" }, "*");
-      setTimeout(function() {
-        overlay.style.display = "none";
-        frame.src = "";
-        frame.style.opacity = "0";
-        loading.style.display = "none";
-      }, 300);
-    }
-
-    window.addEventListener("message", function(e) {
-      if (!e.data) return;
-      if (e.data.type === "game-back") closeGame();
-      if (e.data.type === "game-fullscreen") {
-        if (frame.requestFullscreen) frame.requestFullscreen();
-        else if (frame.webkitRequestFullscreen) frame.webkitRequestFullscreen();
-      }
-    });
 
     function buildCard(g, i) {
       var card = document.createElement("div");
