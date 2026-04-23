@@ -169,7 +169,7 @@
         try {
           var enc = btoa(encodeURIComponent(targetUrl))
             .replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
-          targetUrl = "/atlas/" + enc;
+          targetUrl = "../atlas/" + enc;
         } catch (e) {}
       }
     }
