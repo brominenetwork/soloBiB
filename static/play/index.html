@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>soloBiB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    #game-frame {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 1;
+    }
+
+    #game-frame.visible { opacity: 1; }
+
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    #loader.out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .loader-body {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      width: 340px;
+    }
+
+    .loader-wordmark {
+      font-family: "Caveat", cursive;
+      font-size: 52px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      opacity: 0.92;
+    }
+
+    .loader-spinner {
+      position: relative;
+      width: 68px;
+      height: 68px;
+    }
+
+    .loader-spinner::before,
+    .loader-spinner::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+
+    .loader-spinner::before {
+      border: 2.5px solid rgba(255,255,255,0.08);
+    }
+
+    .loader-spinner::after {
+      border: 2.5px solid transparent;
+      border-top-color: rgba(255,255,255,0.85);
+      border-right-color: rgba(255,255,255,0.3);
+      animation: spin 0.85s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loader-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .loader-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .loader-url {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .loader-progress {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 2px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: rgba(255,255,255,0.75);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    .progress-bar.animating {
+      animation: fake-progress 3.5s cubic-bezier(0.15, 0, 0.4, 1) forwards;
+    }
+
+    @keyframes fake-progress {
+      0%   { width: 0%; }
+      30%  { width: 45%; }
+      60%  { width: 68%; }
+      85%  { width: 80%; }
+      100% { width: 85%; }
+    }
+
+    #err {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: #000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    #err.show { display: flex; }
+
+    #err .err-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+    }
+
+    #err .err-sub {
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <iframe
+    id="game-frame"
+    allowfullscreen
+    allow="autoplay; fullscreen; clipboard-write; microphone; camera; gamepad; accelerometer; gyroscope"
+  ></iframe>
+
+  <div id="loader">
+    <div class="loader-glow"></div>
+    <div class="loader-body">
+      <div class="loader-wordmark">soloBiB</div>
+      <div class="loader-spinner"></div>
+      <div class="loader-info">
+        <div class="loader-label">Now loading</div>
+        <div class="loader-url" id="loader-url">—</div>
+      </div>
+      <div class="loader-progress">
+        <div class="progress-track">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="err">
+    <div class="err-title">Nothing to load</div>
+    <div class="err-sub">Use <code>/play?url</code> or <code>/play?url+s</code> to proxy</div>
+  </div>
+
+  <script>
+    var raw = location.search.slice(1);
+
+    var useProxy = false;
+    if (raw.endsWith("+s")) {
+      useProxy = true;
+      raw = raw.slice(0, -2);
+    } else if (raw.endsWith("%2Bs")) {
+      useProxy = true;
+      raw = raw.slice(0, -4);
+    }
+
+    try { raw = decodeURIComponent(raw); } catch (e) {}
+
+    var targetUrl = "";
+    if (raw) {
+      if (raw.startsWith("/")) {
+        targetUrl = raw;
+      } else if (/^https?:\/\//i.test(raw)) {
+        targetUrl = raw;
+      } else {
+        targetUrl = "https://" + raw;
+      }
+
+      if (useProxy && !targetUrl.startsWith("/")) {
+        try {
+          var enc = btoa(encodeURIComponent(targetUrl))
+            .replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+          targetUrl = "/atlas/" + enc;
+        } catch (e) {}
+      }
+    }
+
+    var loaderUrl = document.getElementById("loader-url");
+    var progressBar = document.getElementById("progress-bar");
+    var loader = document.getElementById("loader");
+    var frame = document.getElementById("game-frame");
+    var errEl = document.getElementById("err");
+
+    var displayName = raw
+      .replace(/^https?:\/\/(www\.)?/, "")
+      .split("/")[0] || raw || "unknown";
+
+    loaderUrl.textContent = displayName;
+    if (displayName) document.title = displayName + " — soloBiB";
+
+    if (!targetUrl) {
+      loader.style.display = "none";
+      errEl.classList.add("show");
+    } else {
+      requestAnimationFrame(function () {
+        progressBar.classList.add("animating");
+      });
+
+      var revealed = false;
+      function reveal() {
+        if (revealed) return;
+        revealed = true;
+
+        progressBar.style.animation = "none";
+        progressBar.style.width = "100%";
+
+        setTimeout(function () {
+          loader.classList.add("out");
+          frame.classList.add("visible");
+          setTimeout(function () {
+            loader.style.display = "none";
+          }, 500);
+        }, 300);
+      }
+
+      frame.src = targetUrl;
+      frame.onload = function () {
+        frame.onload = null;
+        reveal();
+      };
+
+      setTimeout(reveal, 10000);
+    }
+  </script>
+</body>
+</html>
