@@ -52,6 +52,5 @@ static/
 
 - discord: [discord.gg/unblockings](https://discord.gg/unblockings)
 - telegram: [t.me/@qatual](https://t.me/@qatual)
-- github: [github.com/brominenetwork/Atlas](https://github.com/brominenetwork/Atlas)
-
+  
 if something breaks, report it in the discord.
