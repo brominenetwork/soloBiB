@@ -469,9 +469,6 @@
       playtimeDisplay.textContent = h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
     }
 
-    var displayName = raw.replace(/^https?:\/\/(www\.)?/, "").split("/")[0] || raw;
-    if (displayName) document.title = displayName + " — soloBiB";
-
     function startSession() {
       loader.classList.add("out");
       frame.classList.add("visible");
