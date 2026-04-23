@@ -251,7 +251,7 @@
     function openGame(url) {
       frame.style.opacity = "0";
       frame.src = url;
-      overlay.style.display = "block";
+      overlay.style.display = "flex";
       loading.style.display = "block";
       browserView.classList.add("view-hidden");
       window.parent.postMessage({ type: "game-open" }, "*");
