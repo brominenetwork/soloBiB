@@ -59,16 +59,15 @@ function serveFile(res, filePath) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
-  if (!url.pathname.startsWith("/books/")) {
+  if (url.pathname === "/api/fetch") {
     res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
     res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-  }
-
-  if (url.pathname === "/api/fetch") {
     return handleProxy(req, res, url);
   }
 
   if (url.pathname.startsWith("/atlas/")) {
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+    res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.end(SW_SHELL);
     return;
