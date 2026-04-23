@@ -352,18 +352,28 @@
       });
 
       document.getElementById("btn-game-back").addEventListener("click", function () {
-        frame.contentWindow.postMessage({ type: "game-back" }, "*");
+        navigate("/games.html");
+        document.body.classList.remove("game-mode");
       });
 
       document.getElementById("btn-game-fullscreen").addEventListener("click", function () {
-        frame.contentWindow.postMessage({ type: "game-fullscreen" }, "*");
+        if (frame.requestFullscreen) frame.requestFullscreen();
+        else if (frame.webkitRequestFullscreen) frame.webkitRequestFullscreen();
       });
 
       window.addEventListener("message", function (e) {
         if (!e.data) return;
         if (e.data.type === "nav") navigate(e.data.src);
-        if (e.data.type === "game-open") document.body.classList.add("game-mode");
-        if (e.data.type === "game-close") document.body.classList.remove("game-mode");
+        if (e.data.type === "open-game") {
+          document.body.classList.add("game-mode");
+          frame.style.opacity = "0";
+          frame.onload = null;
+          frame.src = e.data.url;
+          frame.onload = function () {
+            frame.onload = null;
+            frame.style.opacity = "1";
+          };
+        }
       });
     })();
   </script>
