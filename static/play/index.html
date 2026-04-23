@@ -62,33 +62,33 @@
       100% { transform: rotate(360deg); }
     }
 
-    #start-btn {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 999px;
-      color: rgba(255,255,255,0.82);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 13px 36px;
+    #brand-text {
+      font-family: "Parkinsans", sans-serif;
+      font-weight: 700;
+      font-size: 38px;
+      color: #fff;
+      display: flex;
       cursor: pointer;
-      letter-spacing: 0.05em;
       opacity: 0;
       pointer-events: none;
-      transform: translateY(14px);
-      transition: opacity 0.45s ease, transform 0.45s ease, background 0.15s, border-color 0.15s;
+      transition: opacity 0.45s ease;
+      user-select: none;
     }
 
-    #start-btn:hover {
-      background: rgba(255,255,255,0.14);
-      border-color: rgba(255,255,255,0.24);
-      color: #fff;
-    }
-
-    #start-btn.visible {
+    #brand-text.visible {
       opacity: 1;
       pointer-events: auto;
-      transform: translateY(0);
+    }
+
+    #brand-text span {
+      display: inline-block;
+      animation: wave 1.6s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 80ms);
+    }
+
+    @keyframes wave {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
     #err {
