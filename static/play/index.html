@@ -175,7 +175,7 @@
     }
 
     var logo = document.getElementById("logo-img");
-    var startBtn = document.getElementById("start-btn");
+    var brandText = document.getElementById("brand-text");
     var loader = document.getElementById("loader");
     var frame = document.getElementById("game-frame");
     var errEl = document.getElementById("err");
@@ -183,11 +183,13 @@
     var displayName = raw.replace(/^https?:\/\/(www\.)?/, "").split("/")[0] || raw;
     if (displayName) document.title = displayName + " — soloBiB";
 
-    startBtn.addEventListener("click", function () {
+    function startSession() {
       loader.classList.add("out");
       frame.classList.add("visible");
       setTimeout(function () { loader.style.display = "none"; }, 500);
-    });
+    }
+
+    brandText.addEventListener("click", startSession);
 
     if (!targetUrl) {
       loader.style.display = "none";
