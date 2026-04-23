@@ -119,50 +119,28 @@
       }
     }
 
-    var loaderUrl = document.getElementById("loader-url");
-    var progressBar = document.getElementById("progress-bar");
     var loader = document.getElementById("loader");
     var frame = document.getElementById("game-frame");
     var errEl = document.getElementById("err");
 
-    var displayName = raw
-      .replace(/^https?:\/\/(www\.)?/, "")
-      .split("/")[0] || raw || "unknown";
-
-    loaderUrl.textContent = displayName;
+    var displayName = raw.replace(/^https?:\/\/(www\.)?/, "").split("/")[0] || raw;
     if (displayName) document.title = displayName + " — soloBiB";
 
     if (!targetUrl) {
       loader.style.display = "none";
       errEl.classList.add("show");
     } else {
-      requestAnimationFrame(function () {
-        progressBar.classList.add("animating");
-      });
-
       var revealed = false;
       function reveal() {
         if (revealed) return;
         revealed = true;
-
-        progressBar.style.animation = "none";
-        progressBar.style.width = "100%";
-
-        setTimeout(function () {
-          loader.classList.add("out");
-          frame.classList.add("visible");
-          setTimeout(function () {
-            loader.style.display = "none";
-          }, 500);
-        }, 300);
+        loader.classList.add("out");
+        frame.classList.add("visible");
+        setTimeout(function () { loader.style.display = "none"; }, 500);
       }
 
       frame.src = targetUrl;
-      frame.onload = function () {
-        frame.onload = null;
-        reveal();
-      };
-
+      frame.onload = function () { frame.onload = null; reveal(); };
       setTimeout(reveal, 10000);
     }
   </script>
