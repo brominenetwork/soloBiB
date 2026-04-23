@@ -248,19 +248,27 @@
     var loading = document.getElementById("loading-container");
 
     function openGame(url) {
+      frame.style.opacity = "0";
+      frame.src = url;
       overlay.style.display = "block";
       loading.style.display = "block";
-      frame.style.opacity = "0";
       browserView.classList.add("view-hidden");
       window.parent.postMessage({ type: "game-open" }, "*");
 
       requestAnimationFrame(function() {
-        overlay.classList.add("view-active");
+        requestAnimationFrame(function() {
+          overlay.classList.add("view-active");
+        });
       });
 
-      frame.src = url;
+      var showTimer = setTimeout(function() {
+        loading.style.display = "none";
+        frame.style.opacity = "1";
+      }, 4000);
+
       frame.onload = function() {
         frame.onload = null;
+        clearTimeout(showTimer);
         loading.style.display = "none";
         frame.style.opacity = "1";
       };
