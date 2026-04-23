@@ -314,6 +314,7 @@
       function navigate(src) {
         var isAtlas = src.startsWith("/atlas/");
         document.body.classList.toggle("atlas-mode", isAtlas);
+        document.body.classList.remove("game-mode");
         btns.forEach(function (b) {
           b.classList.toggle("active", b.dataset.src === src);
         });
