@@ -189,7 +189,15 @@
       setTimeout(function () { loader.style.display = "none"; }, 500);
     }
 
-    brandText.addEventListener("click", startSession);
+    brandText.addEventListener("click", function () {
+      brandText.style.opacity = "0";
+      setTimeout(startSession, 450);
+    });
+
+    brandText.querySelector("span:last-child").addEventListener("animationend", function () {
+      brandText.style.opacity = "0";
+      setTimeout(startSession, 450);
+    });
 
     if (!targetUrl) {
       loader.style.display = "none";
