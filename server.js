@@ -87,6 +87,12 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  const indexPath = path.join(filePath, "index.html");
+  if (fs.existsSync(indexPath) && fs.statSync(indexPath).isFile()) {
+    serveFile(res, indexPath);
+    return;
+  }
+
   res.writeHead(404, { "Content-Type": "text/plain" });
   res.end("Not found");
 });
