@@ -446,9 +446,17 @@
     var volLabel = document.getElementById("vol-label");
     var shotBtn = document.getElementById("shot-btn");
     var urlCard = document.getElementById("url-card");
+    var playtimeDisplay = document.getElementById("playtime-display");
 
-    var displayUrl = useProxy ? raw : targetUrl;
-    urlCard.textContent = displayUrl || targetUrl;
+    var sessionStart = null;
+    function tickPlaytime() {
+      if (!sessionStart) return;
+      var elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+      var h = Math.floor(elapsed / 3600);
+      var m = Math.floor((elapsed % 3600) / 60);
+      var s = elapsed % 60;
+      playtimeDisplay.textContent = h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    }
 
     var displayName = raw.replace(/^https?:\/\/(www\.)?/, "").split("/")[0] || raw;
     if (displayName) document.title = displayName + " — soloBiB";
