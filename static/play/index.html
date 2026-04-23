@@ -105,6 +105,170 @@
     }
 
     #err.show { display: flex; }
+
+    #game-ui {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    #game-ui.active { display: block; }
+
+    #trigger {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 72px;
+      height: 6px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 0 0 6px 6px;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: background 0.15s, height 0.15s;
+      z-index: 10;
+    }
+
+    #trigger:hover {
+      background: rgba(255,255,255,0.5);
+      height: 8px;
+    }
+
+    #overlay-bg {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    #game-ui.open #overlay-bg {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #navbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 8px;
+      transform: translateY(-100%);
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      z-index: 11;
+    }
+
+    #game-ui.open #navbar {
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    #nav-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+    }
+
+    #nav-logo:hover { opacity: 0.75; }
+
+    .nav-spacer { flex: 1; }
+
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: rgba(255,255,255,0.07);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      position: relative;
+      flex-shrink: 0;
+      color: #fff;
+    }
+
+    .nav-btn:hover { background: rgba(255,255,255,0.14); }
+
+    .nav-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: rgba(255,255,255,0.85);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #vol-popup {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      right: 0;
+      background: rgba(18,18,18,0.95);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 10px;
+      align-items: center;
+      flex-direction: column;
+      gap: 8px;
+      width: 44px;
+    }
+
+    #vol-popup.open { display: flex; }
+
+    #vol-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      writing-mode: vertical-lr;
+      direction: rtl;
+      width: 4px;
+      height: 100px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    #vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    #vol-slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    #vol-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
   </style>
 </head>
 <body>
@@ -122,6 +286,25 @@
   </div>
 
   <div id="err">error, sorry!</div>
+
+  <div id="game-ui">
+    <div id="overlay-bg"></div>
+    <div id="trigger"></div>
+    <div id="navbar">
+      <img id="nav-logo" src="/logo.png" alt="home">
+      <div class="nav-spacer"></div>
+      <div class="nav-btn" id="vol-btn">
+        <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        <div id="vol-popup">
+          <input id="vol-slider" type="range" min="0" max="100" value="100" orient="vertical">
+          <span id="vol-label">100</span>
+        </div>
+      </div>
+      <div class="nav-btn" id="shot-btn">
+        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </div>
+    </div>
+  </div>
 
   <script src="/three.min.js"></script>
   <script src="/vantafog.min.js"></script>
@@ -179,6 +362,15 @@
     var loader = document.getElementById("loader");
     var frame = document.getElementById("game-frame");
     var errEl = document.getElementById("err");
+    var gameUi = document.getElementById("game-ui");
+    var trigger = document.getElementById("trigger");
+    var overlayBg = document.getElementById("overlay-bg");
+    var navLogo = document.getElementById("nav-logo");
+    var volBtn = document.getElementById("vol-btn");
+    var volPopup = document.getElementById("vol-popup");
+    var volSlider = document.getElementById("vol-slider");
+    var volLabel = document.getElementById("vol-label");
+    var shotBtn = document.getElementById("shot-btn");
 
     var displayName = raw.replace(/^https?:\/\/(www\.)?/, "").split("/")[0] || raw;
     if (displayName) document.title = displayName + " — soloBiB";
@@ -186,7 +378,10 @@
     function startSession() {
       loader.classList.add("out");
       frame.classList.add("visible");
-      setTimeout(function () { loader.style.display = "none"; }, 500);
+      setTimeout(function () {
+        loader.style.display = "none";
+        gameUi.classList.add("active");
+      }, 500);
     }
 
     brandText.addEventListener("click", function () {
@@ -197,6 +392,61 @@
     brandText.querySelector("span:last-child").addEventListener("animationend", function () {
       brandText.style.opacity = "0";
       setTimeout(startSession, 450);
+    });
+
+    trigger.addEventListener("click", function () {
+      gameUi.classList.toggle("open");
+      volPopup.classList.remove("open");
+    });
+
+    overlayBg.addEventListener("click", function () {
+      gameUi.classList.remove("open");
+      volPopup.classList.remove("open");
+    });
+
+    navLogo.addEventListener("click", function () {
+      window.location.href = "/";
+    });
+
+    volBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      volPopup.classList.toggle("open");
+    });
+
+    function applyVolume(v) {
+      volLabel.textContent = v;
+      var frac = v / 100;
+      try {
+        var doc = frame.contentDocument || frame.contentWindow.document;
+        doc.querySelectorAll("video, audio").forEach(function (el) { el.volume = frac; });
+      } catch (e) {}
+    }
+
+    volSlider.addEventListener("input", function () {
+      applyVolume(parseInt(this.value, 10));
+    });
+
+    shotBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      navigator.mediaDevices.getDisplayMedia({ video: true, audio: false }).then(function (stream) {
+        var video = document.createElement("video");
+        video.srcObject = stream;
+        video.onloadedmetadata = function () {
+          video.play();
+          var canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          canvas.getContext("2d").drawImage(video, 0, 0);
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          canvas.toBlob(function (blob) {
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "screenshot.png";
+            a.click();
+            setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+          }, "image/png");
+        };
+      }).catch(function () {});
     });
 
     if (!targetUrl) {
