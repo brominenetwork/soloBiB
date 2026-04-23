@@ -121,10 +121,10 @@
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 52px;
-      height: 40px;
-      background: rgba(20,20,20,0.92);
-      border-radius: 0 0 14px 14px;
+      width: 96px;
+      height: 28px;
+      background: rgba(28,28,28,0.88);
+      border-radius: 0 0 12px 12px;
       cursor: pointer;
       pointer-events: auto;
       transition: background 0.15s;
@@ -132,21 +132,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.1);
       border-top: none;
-      gap: 0;
       flex-direction: column;
+      gap: 3px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
 
-    #trigger:hover { background: rgba(35,35,35,0.96); }
+    #trigger:hover { background: rgba(44,44,44,0.95); }
 
     #trigger .bar {
-      width: 18px;
-      height: 2px;
-      background: rgba(255,255,255,0.85);
+      width: 16px;
+      height: 1.5px;
+      background: rgba(255,255,255,0.7);
       border-radius: 2px;
-      margin: 2px 0;
     }
 
     #overlay-bg {
