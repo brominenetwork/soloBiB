@@ -6,13 +6,13 @@
 
 fixed:
 music, replaced vapor with monochrome
-games, the play directory just suddenly died ig
+games, the play directory just suddenly died i guess
 
 added:
 nothing
 
 removed:
-nothing
+the music tab, maybe ill remake it and add it in the future
 -----------------------------------------------
 
     ----------- older updates -----------
