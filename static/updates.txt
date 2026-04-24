@@ -1,21 +1,31 @@
 
---- newest updates! ---
+  ----------- newest updates! -----------
 
 -----------------------------------------------
-4/24/2026 - qatual
+4/24/2026 - @qatual
+
 fixed:
 music, replaced vapor with monochrome
 games, the play directory just suddenly died ig
 
-discord.gg/unblockings
+added:
+nothing
+
+removed:
+nothing
 -----------------------------------------------
 
---- older updates ---
+    ----------- older updates -----------
 
 -----------------------------------------------
-4/23/2026 - qatual
+4/23/2026 - @qatual
+
 added:
 published soloBiB V5 to the repo and discord
 
-discord.gg/unblockings 
+fixed:
+nothing
+
+removed:
+nothing
 -----------------------------------------------
